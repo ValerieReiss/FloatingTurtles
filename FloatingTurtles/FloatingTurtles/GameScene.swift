@@ -29,13 +29,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var currentTouchPosition: CGPoint  = CGPointZero
     var beginningTouchPosition:CGPoint = CGPointZero
     var currentPlayerPosition: CGPoint = CGPointZero
+    var currentTurtle2Position: CGPoint = CGPointZero
 
     var playableRectArea:CGRect = CGRectZero
-
+    
     override func didMove(to view: SKView) {
+        //self.anchorPoint = CGPointMake(0, 0)
         
         let backgroundImage = SKSpriteNode(imageNamed: "background")
-        backgroundImage.anchorPoint = CGPointMake(0.5, 0.5)
         backgroundImage.size = CGSize(width: self.size.width, height: self.size.height)
         backgroundImage.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame))
         backgroundImage.zPosition = -20
@@ -50,24 +51,41 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(scoreLabel)
         scoreLabel.text = "\(hearts)"
         
+        //let turtle2 = Turtle2(moveStraight: true)
         addChild(turtle2)
-        turtle2.position = CGPoint(x: CGRectGetMidX(self.frame)+200, y: CGRectGetMidY(self.frame))
         
         addChild(player)
         player.position = CGPoint(x: CGRectGetMidX(self.frame)-200, y: CGRectGetMidY(self.frame))
         
+        let invisible = SKSpriteNode(color: UIColor.cyan, size: CGSizeMake(600, 360))
+            invisible.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
+            invisible.alpha = 0.2
+            invisible.zPosition = -10
+            self.addChild(invisible)
+        
+        //var playableRect = CGRect
+       
         let maxAspectRatio:CGFloat = 16.0/9.0
         let playableHeight = size.width / maxAspectRatio
         let playableMargin = (size.height-playableHeight)/2.0
         playableRectArea = CGRect(x: 0, y: playableMargin,
-                                              width: size.width,
-                                              height: playableHeight)
+                                      width: size.width,
+                                      height: playableHeight)
+        /*
+        let shape = SKShapeNode()
+        let path = CGMutablePath()
+        path.addRect(playableRectArea)
+        shape.path = path
+        shape.strokeColor = SKColor.red
+        shape.lineWidth = 4.0
+        addChild(shape)*/
         
         currentTouchPosition = CGPointZero
         beginningTouchPosition = CGPointZero
         currentPlayerPosition = CGPoint(x: CGRectGetMidX(self.frame)-200, y: CGRectGetMidY(self.frame))
                 
         player.position = currentPlayerPosition
+        
     }
  
     func didBegin(_ contact: SKPhysicsContact){
@@ -87,6 +105,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else {
             print("still not")
         }
+        
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -97,27 +116,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let dyVectorValue = (-1) * (beginningTouchPosition.y - currentTouchPosition.y)
             player.movePlayerBy(dxVectorValue: dxVectorValue, dyVectorValue: dyVectorValue, duration: dt)
         }
-
-        override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
             player.removeAllActions()
             player.stopMoving()
+        
         }
 
-        override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             for touch: AnyObject in touches {
                 beginningTouchPosition = touch.location(in:self)
                 currentTouchPosition = beginningTouchPosition
             }
+            
         }
 
-        override func update(_ currentTime: CFTimeInterval) {
+    override func update(_ currentTime: CFTimeInterval) {
             currentPlayerPosition = player.position
             if lastUpdateTime > 0 {dt = currentTime - lastUpdateTime}
             else {dt = 0}
             lastUpdateTime = currentTime
             player.boundsCheckPlayer(playableArea: playableRectArea)
+            turtle2.boundsCheckPlayer(playableArea: playableRectArea)
+            
+            turtle2.moveTurtle2()
         }
-
+    
     func stopMoving() {
         let delayTime: TimeInterval = 0.5  // 0.5 second pause
         let stopAction: SKAction = SKAction.run{

@@ -12,19 +12,18 @@ struct PhysicsCategory {
     static let None         : UInt32 = 0
     static let All          : UInt32 = UInt32.max
     static let Player       : UInt32 = 0b1       // 1
-    static let Enemy        : UInt32 = 0b10      // 2
+    static let Turtle2      : UInt32 = 0b10      // 2
 }
 
 class Player: SKSpriteNode{
 
 init(){
-
     let texture = SKTexture(imageNamed: "turtle")
 
     super.init(texture: texture, color: UIColor.clear, size: texture.size())
 
-    self.xScale = 0.5
-    self.yScale = 0.5
+    self.xScale = 1
+    self.yScale = 1
     self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
     self.zPosition = 1
 
@@ -48,22 +47,22 @@ func boundsCheckPlayer(playableArea: CGRect){
     let topRight = CGPoint(x: playableArea.size.width, y: CGRectGetMaxY(playableArea))
 
     if(self.position.x <= bottomLeft.x){
-        self.position.x = bottomLeft.x
+        self.position.x = bottomLeft.x + self.size.width
         // velocity.x = -velocity.x
     }
 
     if(self.position.x >= topRight.x){
-        self.position.x = topRight.x
+        self.position.x = topRight.x - self.size.width
         // velocity.x = -velocity.x
     }
 
     if(self.position.y <= bottomLeft.y){
-        self.position.y = bottomLeft.y
+        self.position.y = bottomLeft.y + self.size.height
         // velocity.y = -velocity.y
     }
 
     if(self.position.y >= topRight.y){
-        self.position.y = topRight.y
+        self.position.y = topRight.y - self.size.height
         // velocity.y = -velocity.y
     }
 }
